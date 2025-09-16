@@ -62,7 +62,12 @@ elif step == "2. Preprocessing":
         # Example preprocessing options
         do_norm = st.checkbox("Normalize features (min–max)")
         if do_norm:
-            df = (df - df.min()) / (df.max() - df.min())
+            # Select numeric columns
+            numeric_cols = df.select_dtypes(include=['number']).columns  
+
+            # Apply Min-Max normalization only on numeric columns
+            df[numeric_cols] = (df[numeric_cols] - df[numeric_cols].min()) / (df[numeric_cols].max() - df[numeric_cols].min())
+
         
         remove_zero = st.checkbox("Drop rows with any zero values")
         if remove_zero:
@@ -95,16 +100,28 @@ elif step == "4. Visualization":
     else:
         df = st.session_state.df
         chart_type = st.selectbox("Select chart type", ["Bar count", "Histogram of a feature"])
+        
         fig, ax = plt.subplots()
+        
         if chart_type == "Bar count":
             df["Adulterated"].value_counts().sort_index().plot(kind="bar", ax=ax)
             ax.set_xticklabels(["Pure (0)", "Adulterated (1)"], rotation=0)
             ax.set_ylabel("Sample count")
         else:
-            feature = st.selectbox("Feature to histogram", df.columns.drop("Adulterated"))
-            df[feature].plot(kind="hist", bins=20, ax=ax)
-            ax.set_xlabel(feature)
-            ax.set_ylabel("Frequency")
+            feature = st.selectbox("Feature to visualize", df.columns.drop("Adulterated"))
+
+            if pd.api.types.is_numeric_dtype(df[feature]):
+                # Numeric → histogram
+                df[feature].plot(kind="hist", bins=20, ax=ax)
+                ax.set_xlabel(feature)
+                ax.set_ylabel("Frequency")
+            else:
+                # Categorical → bar plot
+                df[feature].value_counts().plot(kind="bar", ax=ax)
+                ax.set_xlabel(feature)
+                ax.set_ylabel("Count")
+        
+        # ✅ Render the figure in Streamlit
         st.pyplot(fig)
 
 # 5. Results
