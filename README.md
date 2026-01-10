@@ -1,5 +1,5 @@
 An interactive **Streamlit web application** for detecting and analyzing **food adulteration** using data visualization and machine learning techniques.  
-This project is aimed at raising awareness about food safety and providing an easy-to-use tool for quick analysis.
+This project is aimed at raising awareness about food safety and providing an easy-to-use tool for quick analysis. This is a demo version without any ML models it has a place holders where you can insert your model for working. 
 
 ---
 
